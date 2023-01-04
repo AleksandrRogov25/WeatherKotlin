@@ -14,6 +14,7 @@ import com.example.weatherkotlin.viewmodel.AppState
 import com.example.weatherkotlin.viewmodel.MainViewModel
 import com.google.android.material.snackbar.Snackbar
 
+
 class MainFragment : Fragment() {
 
     private var _binding: FragmentMainBinding? = null
@@ -46,7 +47,6 @@ class MainFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
 
-
         val observer = Observer<AppState> {
             renderData(it)
         }
@@ -55,7 +55,7 @@ class MainFragment : Fragment() {
         viewModel.getWeather()
     }
 
-    private fun renderData(appState : AppState) {
+    private fun renderData(appState: AppState) {
         when (appState) {
             is AppState.Success -> {
                 val weatherData = appState.weatherData
@@ -83,7 +83,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun setData(weatherData : Weather) {
+    private fun setData(weatherData: Weather) {
         binding.cityName.text = weatherData.city.city
 
         binding.cityCoordinates.text = String.format(
