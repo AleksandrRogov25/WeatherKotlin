@@ -1,28 +1,37 @@
 package com.example.weatherkotlin.viewmodel
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.weatherkotlin.model.Repository
 import com.example.weatherkotlin.model.RepositoryImpl
 
-class MainViewModel (
-    private val liveDataToObserve : MutableLiveData<AppState> = MutableLiveData(),
-    private val repositoryImpl : Repository = RepositoryImpl()
-    ) : ViewModel() {
+class MainViewModel(
+    private val liveDataToObserve: MutableLiveData<AppState> = MutableLiveData(),
+    private val repositoryImpl: Repository = RepositoryImpl()
+) : ViewModel() {
 
-        fun getLiveData() = liveDataToObserve
+    fun getLiveData() = liveDataToObserve
 
-        fun getWeather() = getDataFromLocalSource()
+    fun getWeather() = getDataFromLocalSource(true)
 
-        private fun getDataFromLocalSource() {
-            liveDataToObserve.value = AppState.Loading
+    fun getWeatherFromLocalSourceRus() = getDataFromLocalSource(true)
+    fun getWeatherFromLocalSourceWorld() = getDataFromLocalSource(false)
 
-            Thread {
-                Thread.sleep(2000)
+    private fun getDataFromLocalSource(isRus: Boolean) {
+        liveDataToObserve.value = AppState.Loading
 
-                liveDataToObserve.postValue(
-                    AppState.Success(repositoryImpl.getWeatherFromLocalStorage()))
-            }.start()
-        }
+        Thread {
+            Thread.sleep(2000)
+
+            liveDataToObserve.postValue(
+                AppState.Success(
+                    if (isRus) {
+                        repositoryImpl.getWeatherFromLocalStorageRus()
+                    } else {
+                        repositoryImpl.getWeatherFromLocalStorageWorld()
+                    }
+                )
+            )
+        }.start()
     }
+}
