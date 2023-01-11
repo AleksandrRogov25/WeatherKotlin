@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.lifecycle.get
 import com.example.weatherkotlin.R
 import com.example.weatherkotlin.databinding.FragmentMainBinding
 import com.example.weatherkotlin.model.Weather
@@ -26,19 +27,19 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by lazy {
+        ViewModelProvider(this).get(MainViewModel::class.java)
+    }
+
     private var isDataSetRus: Boolean = true
 
     private val adapter = MainFragmentAdapter(object : MainFragmentAdapter.OnItemViewClickListener {
         override fun onItemClick(weather: Weather) {
-            val fragmentManager = activity?.supportFragmentManager
-
-            if (fragmentManager != null) {
-                val bundle = Bundle()
-
-                bundle.putParcelable(DetailsFragment.BUNDLE_EXTRA, weather)
-                fragmentManager.beginTransaction()
-                    .add(R.id.container, DetailsFragment.newInstance(bundle))
+            activity?.supportFragmentManager?.apply {
+                beginTransaction()
+                    .add(R.id.container, DetailsFragment.newInstance(Bundle().apply {
+                        putParcelable(DetailsFragment.BUNDLE_EXTRA, weather)
+                    }))
                     .addToBackStack("")
                     .commitAllowingStateLoss()
             }
@@ -55,9 +56,11 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.mainFragmentRecyclerView.adapter = adapter
-        binding.mainFragmentFAB.setOnClickListener {
-            changeWeatherDataSet()
+        with(binding) {
+            mainFragmentRecyclerView.adapter = adapter
+            mainFragmentFAB.setOnClickListener {
+                changeWeatherDataSet()
+            }
         }
     }
 
@@ -69,8 +72,6 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
 
         val observer = Observer<AppState> {
